@@ -1,0 +1,48 @@
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+Public class GetMetaData{
+    Public void GetMetaData(String pathName){//文件路径
+            ShpfileUtil shpfileUtil = new ShpfileUtil();
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource =shpfileUtil.getFeatureSource(pathName);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSource.getFeatures();
+            ReferencedEnvelope env = collection.getBounds();
+            // 获取要素迭代器
+            FeatureIterator<SimpleFeature> featureIterator = collection.features();
+            // 要素对象
+            SimpleFeature feature = featureIterator.next();
+            // geometry属性
+            GeometryAttribute geometryAttribute = feature.getDefaultGeometryProperty();
+            // 获取坐标参考系信息
+            CoordinateReferenceSystem coordinateReferenceSystem = geometryAttribute.getDescriptor().getCoordinateReferenceSystem();
+            // geometry类型
+            GeometryType geometryType = geometryAttribute.getType();
+            //范围
+            double left = env.getMinX();
+            double right = env.getMaxX();
+            double top = env.getMaxY();
+            double bottom = env.getMinY();
+            //几何类型
+            Name name = geometryType.getName();
+            //基准面
+            String reference=((DefaultGeographicCRS) env.getCoordinateReferenceSystem()).getDatum().getName().toString();
+            //地理坐标系
+            String coordinate= env.getCoordinateReferenceSystem().getName().toString();
+            //本初子午线
+            String meridian= ((DefaultGeographicCRS) env.getCoordinateReferenceSystem()).getDatum().getPrimeMeridian().getName().toString();
+            //切割字符串
+            String str = env.getCoordinateReferenceSystem().toString().substring(env.getCoordinateReferenceSystem().toString().indexOf("UNIT["));
+            //角度单位
+            String unit = str.substring(6).substring(0,str.indexOf("\"")+1);
+            //是否包含Z值
+            Boolean isZ =false;
+            //是否包含测量值
+            Boolean isMeasure =false;
+            //图层名
+            String shpName = feature.getID().substring(0, feature.getID().length()-2);
+    }
+}
